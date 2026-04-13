@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 
 uses(RefreshDatabase::class);
 
@@ -24,6 +25,23 @@ test('admin users can access admin dashboard', function () {
 
     $response = $this->actingAs($admin)->get(route('admin.dashboard'));
 
-    $response->assertOk();
+    $response
+        ->assertOk()
+        ->assertInertia(fn (Assert $page) => $page
+            ->component('Admin/Dashboard')
+            ->has('stats.total_cars')
+            ->has('stats.available_cars')
+            ->has('stats.featured_cars')
+            ->has('stats.sold_cars')
+            ->has('stats.total_views')
+            ->has('stats.inventory_value')
+            ->has('stats.average_price')
+            ->has('stats.average_mileage')
+            ->has('stats.sell_through_rate')
+            ->has('stats.featured_rate')
+            ->has('topMakes')
+            ->has('bodyTypeMix')
+            ->has('topViewedCars')
+            ->has('recentListings')
+        );
 });
-

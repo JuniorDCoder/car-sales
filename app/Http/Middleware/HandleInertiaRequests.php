@@ -44,9 +44,9 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => session('error'),
             ],
             'settings' => fn () => [
-                'site_name' => SiteSetting::get('site_name', 'AutoElite'),
+                'site_name' => SiteSetting::get('site_name', 'AutoNest'),
                 'site_tagline' => SiteSetting::get('site_tagline', 'Drive Your Dream'),
-                'site_logo_url' => SiteSetting::get('site_logo_url', '/images/autoelite-logo.svg'),
+                'site_logo_url' => SiteSetting::get('site_logo_url', '/images/autonest-logo.svg'),
                 'whatsapp_number' => SiteSetting::get('whatsapp_number'),
                 'whatsapp_message' => SiteSetting::get('whatsapp_message', "Hello, I'm interested in one of your cars."),
                 'currency_symbol' => SiteSetting::get('currency_symbol', '$'),

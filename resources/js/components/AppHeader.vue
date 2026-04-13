@@ -33,7 +33,9 @@ import adminSettings from '@/routes/admin/settings';
 import profile from '@/routes/profile';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
-                                <AppLogo />
+type Props = {
+    breadcrumbs?: BreadcrumbItem[];
+};
 
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],

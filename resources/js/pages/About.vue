@@ -12,7 +12,7 @@ const page = usePage();
 
     <section class="mx-auto max-w-7xl px-4 py-20">
         <div class="rounded-2xl border border-white/10 bg-[#1A1A1A] p-10 text-center">
-            <h1 class="font-display text-5xl">About {{ page.props.settings?.site_name ?? 'AutoElite' }}</h1>
+            <h1 class="font-display text-5xl">About {{ page.props.settings?.site_name ?? 'AutoNest' }}</h1>
             <p class="mx-auto mt-5 max-w-3xl text-[#9CA3AF]">
                 We help drivers discover premium vehicles with transparent pricing and responsive support.
             </p>
@@ -21,10 +21,10 @@ const page = usePage();
         <div class="mt-10 grid gap-8 lg:grid-cols-2">
             <div class="space-y-4 rounded-2xl border border-white/10 bg-[#1A1A1A] p-6">
                 <h2 class="font-display text-3xl">Our Story</h2>
-                <p class="text-[#D1D5DB]">AutoElite was built for buyers who want quality inventory and a fast, friendly buying journey.</p>
+                <p class="text-[#D1D5DB]">AutoNest was built for buyers who want quality inventory and a fast, friendly buying journey.</p>
                 <p class="text-[#D1D5DB]">From first contact to final handover, our team focuses on trust, clarity, and long-term relationships.</p>
             </div>
-            <img src="/images/car-placeholder.svg" alt="AutoElite showroom" class="aspect-16/10 w-full rounded-2xl object-cover" />
+            <img src="/images/car-placeholder.svg" alt="AutoNest showroom" class="aspect-16/10 w-full rounded-2xl object-cover" />
         </div>
 
         <div class="mt-10 grid gap-4 md:grid-cols-3">

@@ -1,7 +1,7 @@
 <x-mail::message>
 # New Contact Enquiry
 
-You have received a new message from the AutoElite website.
+You have received a new message from the AutoNest website.
 
 - **Name:** {{ $data['name'] }}
 - **Email:** {{ $data['email'] }}

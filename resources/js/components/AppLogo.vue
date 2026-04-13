@@ -4,9 +4,9 @@ import { usePage } from '@inertiajs/vue3';
 
 const page = usePage();
 
-const siteName = computed(() => page.props.settings?.site_name ?? 'AutoElite');
+const siteName = computed(() => page.props.settings?.site_name ?? 'AutoNest');
 const siteTagline = computed(() => page.props.settings?.site_tagline ?? 'Drive Your Dream');
-const siteLogoUrl = computed(() => page.props.settings?.site_logo_url ?? '/images/autoelite-logo.svg');
+const siteLogoUrl = computed(() => page.props.settings?.site_logo_url ?? '/images/autonest-logo.svg');
 </script>
 
 <template>

@@ -43,7 +43,7 @@ const year = new Date().getFullYear();
         <header class="sticky top-0 z-40 border-b border-white/5 bg-black/80 backdrop-blur-md">
             <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
                 <Link :href="home()" class="font-display text-2xl font-semibold text-brand-400">
-                    {{ settings.site_name ?? 'AutoElite' }}
+                    {{ settings.site_name ?? 'AutoNest' }}
                 </Link>
 
                 <nav class="hidden items-center gap-5 text-sm text-[#9CA3AF] md:flex">
@@ -103,7 +103,7 @@ const year = new Date().getFullYear();
         <footer class="border-t border-white/5 bg-[#111]">
             <div class="mx-auto grid max-w-7xl gap-6 px-4 py-10 md:grid-cols-3">
                 <div>
-                    <h3 class="font-display text-xl text-brand-400">{{ settings.site_name ?? 'AutoElite' }}</h3>
+                    <h3 class="font-display text-xl text-brand-400">{{ settings.site_name ?? 'AutoNest' }}</h3>
                     <p class="mt-2 text-sm text-[#9CA3AF]">{{ settings.site_tagline ?? 'Drive Your Dream' }}</p>
                     <div class="mt-3 flex items-center gap-2">
                         <a v-if="settings.facebook_url" :href="settings.facebook_url" target="_blank" rel="noopener noreferrer" class="rounded border border-white/10 p-2 text-[#9CA3AF] hover:text-brand-400">
@@ -131,7 +131,7 @@ const year = new Date().getFullYear();
                 </div>
             </div>
             <div class="border-t border-white/5 px-4 py-4 text-center text-xs text-[#6B7280]">
-                Copyright {{ year }} {{ settings.site_name ?? 'AutoElite' }}. All rights reserved.
+                Copyright {{ year }} {{ settings.site_name ?? 'AutoNest' }}. All rights reserved.
             </div>
         </footer>
 
