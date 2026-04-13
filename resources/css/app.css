@@ -221,4 +221,14 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    .dark select {
+        background-color: hsl(0 0% 11%);
+        color: hsl(0 0% 96%);
+    }
+
+    .dark select option {
+        background-color: hsl(0 0% 11%);
+        color: hsl(0 0% 96%);
+    }
 }

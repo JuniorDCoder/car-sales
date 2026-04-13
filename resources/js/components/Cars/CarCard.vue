@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { computed } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { Fuel, Gauge, MessageCircle, Settings2 } from 'lucide-vue-next';
+import { Fuel, Gauge, Mail, MessageCircle, Settings2 } from 'lucide-vue-next';
 import { show as carsShow } from '@/routes/cars';
 import { assetUrl } from '@/composables/useAssetUrl';
 import { useCurrency } from '@/composables/useCurrency';
@@ -20,7 +20,21 @@ const props = defineProps({
 const page = usePage();
 const { formatPrice } = useCurrency();
 
+const isWhatsappEnabled = computed(() => Boolean(page.props.settings?.whatsapp_enabled));
+const contactEmail = computed(() => (page.props.settings?.contact_email ?? '').toString().trim());
+const mailtoLink = computed(() => {
+    if (!contactEmail.value) {
+        return null;
+    }
+
+    return `mailto:${contactEmail.value}`;
+});
+
 const whatsappLink = computed(() => {
+    if (!isWhatsappEnabled.value) {
+        return null;
+    }
+
     const phone = (page.props.settings?.whatsapp_number ?? '').toString().replace(/[^\d]/g, '');
 
     if (!phone) {
@@ -72,6 +86,14 @@ const whatsappLink = computed(() => {
                     aria-label="Contact on WhatsApp"
                 >
                     <MessageCircle class="h-4 w-4" />
+                </a>
+                <a
+                    v-else-if="showWhatsapp && mailtoLink"
+                    :href="mailtoLink"
+                    class="rounded-lg border border-brand-400 px-3 py-2 text-brand-400 transition-all duration-300 hover:bg-brand-400 hover:text-black"
+                    aria-label="Send email enquiry"
+                >
+                    <Mail class="h-4 w-4" />
                 </a>
                 <span v-else class="rounded-lg border border-white/10 px-3 py-2 text-[#6B7280]"><Gauge class="h-4 w-4" /></span>
             </div>

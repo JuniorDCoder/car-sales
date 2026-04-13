@@ -7,6 +7,7 @@ use App\Http\Requests\StoreCarRequest;
 use App\Http\Requests\UpdateCarRequest;
 use App\Models\Car;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -17,10 +18,38 @@ class CarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(): Response
+    public function index(Request $request): Response
     {
+        $query = Car::query()
+            ->when($request->filled('search'), function ($builder) use ($request): void {
+                $search = $request->string('search')->toString();
+                $builder->where(function ($subQuery) use ($search): void {
+                    $subQuery
+                        ->where('title', 'like', "%{$search}%")
+                        ->orWhere('make', 'like', "%{$search}%")
+                        ->orWhere('model', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->filled('make'), fn ($builder) => $builder->where('make', $request->string('make')->toString()))
+            ->when($request->filled('model'), fn ($builder) => $builder->where('model', $request->string('model')->toString()))
+            ->when($request->filled('status'), function ($builder) use ($request): void {
+                $status = $request->string('status')->toString();
+
+                if ($status === 'available') {
+                    $builder->where('is_sold', false);
+                }
+
+                if ($status === 'sold') {
+                    $builder->where('is_sold', true);
+                }
+            })
+            ->when($request->boolean('featured_only'), fn ($builder) => $builder->where('is_featured', true));
+
         return Inertia::render('Admin/Cars/Index', [
-            'cars' => Car::query()->latest()->paginate(15),
+            'cars' => $query->latest()->paginate(15)->withQueryString(),
+            'filters' => $request->only(['search', 'make', 'model', 'status', 'featured_only']),
+            'makeOptions' => Car::query()->orderBy('make')->distinct()->pluck('make')->values(),
+            'modelOptions' => Car::query()->orderBy('model')->distinct()->pluck('model')->values(),
         ]);
     }
 
@@ -29,7 +58,17 @@ class CarController extends Controller
      */
     public function create(): Response
     {
-        return Inertia::render('Admin/Cars/Create');
+        return Inertia::render('Admin/Cars/Create', [
+            'makeOptions' => Car::query()->orderBy('make')->distinct()->pluck('make')->values(),
+            'modelOptions' => Car::query()->orderBy('model')->distinct()->pluck('model')->values(),
+            'modelsByMake' => Car::query()
+                ->select(['make', 'model'])
+                ->orderBy('make')
+                ->orderBy('model')
+                ->get()
+                ->groupBy('make')
+                ->map(fn ($items) => $items->pluck('model')->unique()->values()),
+        ]);
     }
 
     /**
@@ -54,7 +93,9 @@ class CarController extends Controller
 
         Car::query()->create($validated);
 
-        return to_route('admin.cars.index')->with('success', 'Car created successfully.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Car created successfully.']);
+
+        return to_route('admin.cars.index');
     }
 
     /**
@@ -72,6 +113,15 @@ class CarController extends Controller
     {
         return Inertia::render('Admin/Cars/Edit', [
             'car' => $car,
+            'makeOptions' => Car::query()->orderBy('make')->distinct()->pluck('make')->values(),
+            'modelOptions' => Car::query()->orderBy('model')->distinct()->pluck('model')->values(),
+            'modelsByMake' => Car::query()
+                ->select(['make', 'model'])
+                ->orderBy('make')
+                ->orderBy('model')
+                ->get()
+                ->groupBy('make')
+                ->map(fn ($items) => $items->pluck('model')->unique()->values()),
         ]);
     }
 
@@ -84,7 +134,8 @@ class CarController extends Controller
         $validated['is_featured'] = $request->boolean('is_featured');
         $validated['is_sold'] = $request->boolean('is_sold');
 
-        $existingImages = array_values((array) ($validated['existing_images'] ?? $car->images ?? []));
+        $currentImages = array_values((array) ($car->images ?? []));
+        $existingImages = array_values((array) $request->input('existing_images', []));
         unset($validated['existing_images']);
 
         if ($request->hasFile('images')) {
@@ -100,9 +151,23 @@ class CarController extends Controller
             $validated['images'] = $existingImages;
         }
 
+        $removedImages = array_values(array_diff($currentImages, $validated['images']));
+
+        foreach ($removedImages as $removedImage) {
+            Storage::disk('public')->delete($removedImage);
+
+            $directory = dirname($removedImage);
+
+            if ($directory !== '.' && empty(Storage::disk('public')->files($directory))) {
+                Storage::disk('public')->deleteDirectory($directory);
+            }
+        }
+
         $car->update($validated);
 
-        return to_route('admin.cars.index')->with('success', 'Car updated successfully.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Car updated successfully.']);
+
+        return to_route('admin.cars.index');
     }
 
     /**
@@ -123,6 +188,8 @@ class CarController extends Controller
 
         $car->delete();
 
-        return back()->with('success', 'Car deleted successfully.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Car deleted successfully.']);
+
+        return back();
     }
 }

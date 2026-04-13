@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref } from 'vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { Facebook, Instagram, Menu, ShieldCheck, X } from 'lucide-vue-next';
@@ -23,16 +23,6 @@ const navItems = computed(() => [
     { label: 'About', href: about().url, active: currentUrl.value.startsWith('/about') },
     { label: 'Contact', href: contactIndex().url, active: currentUrl.value.startsWith('/contact') },
 ]);
-
-const whatsappLink = computed(() => {
-    const number = (settings.value.whatsapp_number ?? '').toString().replace(/[^\d]/g, '');
-    if (!number) {
-        return null;
-    }
-
-    const message = encodeURIComponent(settings.value.whatsapp_message ?? 'Hello');
-    return `https://wa.me/${number}?text=${message}`;
-});
 
 const year = new Date().getFullYear();
 </script>
@@ -135,7 +125,7 @@ const year = new Date().getFullYear();
             </div>
         </footer>
 
-        <WhatsAppButton v-if="whatsappLink" />
+        <WhatsAppButton />
     </div>
 </template>
 

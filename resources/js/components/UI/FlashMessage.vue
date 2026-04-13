@@ -1,8 +1,8 @@
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
 
-const page = usePage();
+const page = usePage<{ flash?: { success?: string; error?: string } }>();
 const visible = ref(false);
 
 const successMessage = computed(() => page.props.flash?.success);

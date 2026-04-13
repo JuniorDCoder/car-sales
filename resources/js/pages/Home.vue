@@ -1,23 +1,85 @@
-<script setup>
+<script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import { BadgeCheck, Banknote, Car, CircleDollarSign, Clock3, Handshake, MessageCircle, ShieldCheck, Sparkles, Wrench } from 'lucide-vue-next';
 import { index as carsIndex, show as carsShow } from '@/routes/cars';
 import { index as contactIndex } from '@/routes/contact';
 import CarGrid from '@/components/Cars/CarGrid.vue';
+import { assetUrl } from '@/composables/useAssetUrl';
 
 const page = usePage();
 
-const props = defineProps({
-    featuredCars: { type: Array, default: () => [] },
-    latestCars: { type: Array, default: () => [] },
-    heroHeadline: { type: String, default: 'Find Your Perfect Car Today' },
-    heroSubheadline: { type: String, default: 'Premium inventory with trusted support.' },
-    whatsappNumber: { type: String, default: '' },
-    whatsappMessage: { type: String, default: '' },
+const isWhatsappEnabled = computed(() => Boolean(page.props.settings?.whatsapp_enabled));
+const contactEmail = computed(() => (page.props.settings?.contact_email ?? '').toString().trim());
+
+const props = withDefaults(defineProps<{
+    featuredCars?: Array<Record<string, any>>;
+    latestCars?: Array<Record<string, any>>;
+    heroHeadline?: string;
+    heroSubheadline?: string;
+    whatsappNumber?: string;
+    whatsappMessage?: string;
+}>(), {
+    featuredCars: () => [],
+    latestCars: () => [],
+    heroHeadline: 'Find Your Perfect Car Today',
+    heroSubheadline: 'Premium inventory with trusted support.',
+    whatsappNumber: '',
+    whatsappMessage: '',
+});
+
+const scrollPosition = ref(0);
+
+const heroImage = computed(() => {
+    const firstCarWithImage = [...props.featuredCars, ...props.latestCars].find((car) => car?.images?.[0]);
+
+    if (firstCarWithImage?.images?.[0]) {
+        return assetUrl(firstCarWithImage.images[0]);
+    }
+
+    return 'https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=2200&q=80';
+});
+
+const heroWheelStyle = computed(() => {
+    const rotation = Math.min(scrollPosition.value * 0.11, 24);
+    const translateY = Math.min(scrollPosition.value * 0.06, 20);
+
+    return {
+        transform: `translate3d(0, ${translateY}px, 0) rotate(${rotation}deg) scale(1.02)`,
+    };
+});
+
+const heroCardStyle = computed(() => {
+    const offset = Math.min(scrollPosition.value * 0.08, 28);
+    return {
+        transform: `translate3d(0, ${offset}px, 0)`,
+    };
+});
+
+function updateScrollPosition() {
+    scrollPosition.value = window.scrollY || 0;
+}
+
+onMounted(() => {
+    updateScrollPosition();
+    window.addEventListener('scroll', updateScrollPosition, { passive: true });
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('scroll', updateScrollPosition);
 });
 
 function whatsappUrl() {
+    if (!isWhatsappEnabled.value) {
+        return '';
+    }
+
     const phone = (props.whatsappNumber ?? '').replace(/[^\d]/g, '');
+
+    if (!phone) {
+        return '';
+    }
+
     return `https://wa.me/${phone}?text=${encodeURIComponent(props.whatsappMessage || 'Hello')}`;
 }
 
@@ -92,13 +154,16 @@ const faqs = [
 
     <section class="relative isolate overflow-hidden px-4 pt-22 pb-24 md:pt-30">
         <img
-            src="https://images.unsplash.com/photo-1493238792000-8113da705763?auto=format&fit=crop&w=2200&q=80"
+            :src="heroImage"
             alt="Luxury sports car in motion"
             class="animate-slow-pan absolute inset-0 h-full w-full scale-110 object-cover"
         />
         <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/45" />
         <div class="absolute -top-18 -right-14 h-72 w-72 rounded-full bg-brand-400/20 blur-3xl" />
         <div class="absolute bottom-0 -left-24 h-80 w-80 rounded-full bg-sky-500/20 blur-3xl" />
+        <div class="pointer-events-none absolute top-20 right-[-6rem] hidden h-72 w-72 rounded-full border border-white/20 bg-white/5 backdrop-blur-md lg:block" :style="heroWheelStyle">
+            <img :src="heroImage" alt="Rotating featured car visual" class="h-full w-full rounded-full object-cover p-3" />
+        </div>
 
         <div class="relative mx-auto grid max-w-7xl gap-10 lg:grid-cols-12 lg:items-end">
             <div class="lg:col-span-7">
@@ -121,7 +186,7 @@ const faqs = [
             </div>
 
             <div class="lg:col-span-5">
-                <div class="animate-float rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-md">
+                <div class="animate-float rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur-md transition-transform duration-200" :style="heroCardStyle">
                     <h2 class="font-display text-2xl text-white">Why Buyers Choose AutoNest</h2>
                     <div class="mt-5 space-y-3 text-sm text-[#E5E7EB]">
                         <p class="flex items-center gap-2"><ShieldCheck class="h-4 w-4 text-brand-400" /> Verified cars and transparent documentation</p>
@@ -227,8 +292,21 @@ const faqs = [
             <p class="mt-2 text-[#9CA3AF]">Browse premium vehicles or speak to our team instantly.</p>
             <div class="mt-6 flex flex-wrap justify-center gap-3">
                 <Link :href="carsIndex()" class="rounded bg-brand-400 px-5 py-3 font-semibold text-black transition-all duration-300 hover:bg-brand-500">Browse All Cars</Link>
-                <a :href="whatsappUrl()" target="_blank" rel="noopener noreferrer" class="rounded border border-green-500 px-5 py-3 font-semibold text-green-500 transition-all duration-300 hover:bg-green-500 hover:text-black">
+                <a
+                    v-if="whatsappUrl()"
+                    :href="whatsappUrl()"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="rounded border border-green-500 px-5 py-3 font-semibold text-green-500 transition-all duration-300 hover:bg-green-500 hover:text-black"
+                >
                     Contact on WhatsApp
+                </a>
+                <a
+                    v-else-if="contactEmail"
+                    :href="`mailto:${contactEmail}`"
+                    class="rounded border border-brand-400 px-5 py-3 font-semibold text-brand-400 transition-all duration-300 hover:bg-brand-400 hover:text-black"
+                >
+                    Send Email Enquiry
                 </a>
             </div>
         </div>

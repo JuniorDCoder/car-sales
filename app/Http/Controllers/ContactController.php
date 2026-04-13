@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactMail;
 use App\Models\SiteSetting;
-use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
@@ -19,7 +19,9 @@ class ContactController extends Controller
             'message' => 'required|string|min:10|max:3000',
         ]);
 
-        $to = (string) SiteSetting::get('contact_email', config('mail.from.address', 'info@example.com'));
+        $configuredEmail = trim((string) SiteSetting::get('contact_email', ''));
+        $fallbackEmail = (string) config('mail.from.address', 'info@example.com');
+        $to = filter_var($configuredEmail, FILTER_VALIDATE_EMAIL) ? $configuredEmail : $fallbackEmail;
 
         Mail::to($to)->send(new ContactMail($data));
 

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { Car, Eye, Gauge, Layers3, Sparkles, TrendingUp } from 'lucide-vue-next';
 import admin from '@/routes/admin';
@@ -6,17 +6,35 @@ import cars from '@/routes/admin/cars';
 import settings from '@/routes/admin/settings';
 import { useCurrency } from '@/composables/useCurrency';
 
-const props = defineProps({
-    stats: { type: Object, required: true },
-    topMakes: { type: Array, default: () => [] },
-    bodyTypeMix: { type: Array, default: () => [] },
-    topViewedCars: { type: Array, default: () => [] },
-    recentListings: { type: Array, default: () => [] },
+type MetricItem = { label: string; count: number; percentage: number };
+type CarItem = {
+    id: number;
+    slug: string;
+    title: string;
+    price: number;
+    view_count?: number;
+    created_at?: string;
+    is_sold?: boolean;
+    is_featured?: boolean;
+};
+
+const props = withDefaults(defineProps<{
+    stats: Record<string, number>;
+    topMakes?: MetricItem[];
+    bodyTypeMix?: MetricItem[];
+    topViewedCars?: CarItem[];
+    recentListings?: CarItem[];
+}>(), {
+    topMakes: () => [],
+    bodyTypeMix: () => [],
+    topViewedCars: () => [],
+    recentListings: () => [],
 });
 
 const { formatPrice } = useCurrency();
 
-const formatNumber = (value) => new Intl.NumberFormat('en-US').format(Number(value ?? 0));
+const formatNumber = (value: number | string | null | undefined) => new Intl.NumberFormat('en-US').format(Number(value ?? 0));
+const formatDate = (value?: string) => value ? new Date(value).toLocaleDateString() : 'N/A';
 
 const statCards = [
     {
@@ -221,7 +239,7 @@ defineOptions({
                     >
                         <div>
                             <p class="font-medium">{{ car.title }}</p>
-                            <p class="text-xs text-muted-foreground">{{ new Date(car.created_at).toLocaleDateString() }}</p>
+                            <p class="text-xs text-muted-foreground">{{ formatDate(car.created_at) }}</p>
                         </div>
                         <div class="text-right">
                             <p class="text-sm font-semibold">{{ formatPrice(car.price) }}</p>

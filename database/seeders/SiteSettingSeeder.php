@@ -14,6 +14,7 @@ class SiteSettingSeeder extends Seeder
     {
         $settings = [
             ['key' => 'contact_email', 'value' => 'info@autonest.com', 'type' => 'email', 'label' => 'Contact Email Address', 'group' => 'contact'],
+            ['key' => 'whatsapp_enabled', 'value' => '1', 'type' => 'boolean', 'label' => 'Enable WhatsApp Buttons', 'group' => 'contact'],
             ['key' => 'whatsapp_number', 'value' => '+1XXXXXXXXXX', 'type' => 'phone', 'label' => 'WhatsApp Number (with country code, e.g. +1XXXXXXXXXX)', 'group' => 'contact'],
             ['key' => 'whatsapp_message', 'value' => "Hello, I'm interested in one of your cars.", 'type' => 'textarea', 'label' => 'Default WhatsApp Greeting Message', 'group' => 'contact'],
             ['key' => 'site_name', 'value' => 'AutoNest', 'type' => 'text', 'label' => 'Site Name', 'group' => 'branding'],

@@ -27,6 +27,7 @@ test('contact form sends enquiry email', function () {
 
     $response->assertSessionHas('success');
 
-    Mail::assertSent(ContactMail::class);
+    Mail::assertSent(ContactMail::class, function (ContactMail $mail): bool {
+        return $mail->hasTo('dealer@example.com');
+    });
 });
-

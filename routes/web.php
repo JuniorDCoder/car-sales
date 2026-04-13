@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\ContactController;
@@ -12,7 +13,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/cars', [CarController::class, 'index'])->name('cars.index');
 Route::get('/cars/{car:slug}', [CarController::class, 'show'])->name('cars.show');
 Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
-Route::get('/about', fn () => Inertia::render('About'))->name('about');
+Route::get('/about', [AboutController::class, 'index'])->name('about');
 Route::get('/contact', fn () => Inertia::render('Contact'))->name('contact.index');
 
 Route::middleware(['auth', 'verified'])->group(function () {

@@ -1,24 +1,37 @@
-<script setup>
+<script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
 import settingsRoutes from '@/routes/admin/settings';
 import { useCurrency } from '@/composables/useCurrency';
 
-const props = defineProps({
-    settings: { type: Object, required: true },
-});
+type SiteSettingItem = {
+    key: string;
+    value: string | null;
+    type: string;
+    label: string;
+};
 
-const initial = {};
+const props = defineProps<{ settings: Record<string, SiteSettingItem[]> }>();
+
+const initial: Record<string, string | boolean> = {};
 Object.values(props.settings).forEach((group) => {
-    group.forEach((setting) => {
+    group.forEach((setting: SiteSettingItem) => {
+        if (setting.type === 'boolean') {
+            initial[setting.key] = setting.value === '1';
+
+            return;
+        }
+
         initial[setting.key] = setting.value ?? '';
     });
 });
 
-const form = useForm({ settings: initial });
+const form = useForm<any>({ settings: initial });
 const { formatPrice } = useCurrency();
 
 function submit() {
-    form.put(settingsRoutes.update());
+    form.put(settingsRoutes.update().url, {
+        preserveScroll: true,
+    });
 }
 </script>
 
@@ -39,12 +52,22 @@ function submit() {
                             rows="3"
                             class="w-full rounded border border-sidebar-border px-3 py-2"
                         />
+                        <label
+                            v-else-if="setting.type === 'boolean'"
+                            class="inline-flex items-center gap-2"
+                        >
+                            <input v-model="form.settings[setting.key]" type="checkbox" />
+                            <span class="text-sm">Enabled</span>
+                        </label>
                         <input
                             v-else
                             v-model="form.settings[setting.key]"
                             :type="setting.type === 'boolean' ? 'text' : setting.type"
                             class="w-full rounded border border-sidebar-border px-3 py-2"
                         />
+                        <p v-if="form.errors[`settings.${setting.key}`]" class="text-sm text-red-500">
+                            {{ form.errors[`settings.${setting.key}`] }}
+                        </p>
                     </div>
                 </div>
             </div>
