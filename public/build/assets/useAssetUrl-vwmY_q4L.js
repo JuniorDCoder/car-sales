@@ -1,0 +1,1 @@
+function e(e){return e?e.startsWith(`http`)?e:`/storage/${e}`:`/images/car-placeholder.svg`}export{e as t};
