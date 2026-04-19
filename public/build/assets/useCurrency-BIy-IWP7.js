@@ -1,0 +1,1 @@
+import{C as e,u as t}from"./wayfinder-tZCCekPG.js";function n(){let n=t(),r=e(()=>n.props.settings?.currency_symbol??`$`),i=e(()=>n.props.settings?.currency_position??`before`);function a(e){if(e==null)return`-`;let t=Number(e).toLocaleString(`en-US`);return i.value===`before`?`${r.value}${t}`:`${t} ${r.value}`}return{symbol:r,position:i,formatPrice:a}}export{n as t};
