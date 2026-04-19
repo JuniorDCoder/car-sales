@@ -79,11 +79,12 @@ function removeExistingImage(index: number) {
 function submit() {
     form.transform((data: any) => ({
         ...data,
+        _method: 'put',
         features: data.features_text
             .split(',')
             .map((feature: string) => feature.trim())
             .filter(Boolean),
-    })).submit('put', adminCars.update(props.car.slug).url, {
+    })).post(adminCars.update(props.car.slug).url, {
         forceFormData: true,
     });
 }

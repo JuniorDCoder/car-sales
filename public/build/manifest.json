@@ -354,7 +354,7 @@
     ]
   },
   "resources/css/app.css": {
-    "file": "assets/app-Cp52EYzZ.css",
+    "file": "assets/app-9JMfc40Q.css",
     "name": "app",
     "names": [
       "app.css"
@@ -363,7 +363,7 @@
     "isEntry": true
   },
   "resources/js/app.ts": {
-    "file": "assets/app-8S-ci8OO.js",
+    "file": "assets/app-CBGq1vDN.js",
     "name": "app",
     "src": "resources/js/app.ts",
     "isEntry": true,
@@ -448,7 +448,7 @@
     ]
   },
   "resources/js/pages/Admin/Cars/Edit.vue": {
-    "file": "assets/Edit-Bu35LMWO.js",
+    "file": "assets/Edit-zZ2prSg7.js",
     "name": "Edit",
     "src": "resources/js/pages/Admin/Cars/Edit.vue",
     "isDynamicEntry": true,
